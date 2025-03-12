@@ -42,19 +42,13 @@ public class Controller {
     // get All ticket {pagination not yet implement}
     @GetMapping
     @Operation(summary = "Get all tickets")
-    public ResponseEntity<ApiRespones<List<Ticket>>> tickets(@RequestParam int page , int size){
-        int defualtPage = 1 ;
-        int pageSize = 10 ;
-        if(defualtPage != page){
-            defualtPage = page + size;
+    public ResponseEntity<ApiRespones<List<Ticket>>> tickets(@RequestParam(defaultValue = "1") int page ,@RequestParam(defaultValue = "5") int size){
 
-        }
-        if(pageSize != page){
-            pageSize = size;
-        }
+        int currentIndex = (page -1 )*size;
+        int pageSize = size;
 
         if(tickets.size() > 0){
-            listApiRespones = new ApiRespones<>(true,"All tickets retrieved successfully.",HttpStatus.OK,tickets.stream().skip((defualtPage-1)).limit(pageSize).collect(Collectors.toList()),LocalDate.now());
+            listApiRespones = new ApiRespones<>(true,"All tickets retrieved successfully.",HttpStatus.OK,tickets.stream().skip(currentIndex).limit(pageSize).collect(Collectors.toList()),LocalDate.now());
         }else{
             listApiRespones = new ApiRespones<>(false,"There are no Ticket",HttpStatus.NOT_FOUND,LocalDate.now());
         }
