@@ -48,11 +48,9 @@ public class Controller {
         int pageSize = size;
 
         if(tickets.size() > 0){
-            listApiRespones = new ApiRespones<>(true,"All tickets retrieved successfully.",HttpStatus.OK,tickets.stream().skip(currentIndex).limit(pageSize).collect(Collectors.toList()),LocalDate.now());
-        }else{
-            listApiRespones = new ApiRespones<>(false,"There are no Ticket",HttpStatus.NOT_FOUND,LocalDate.now());
+            return ResponseEntity.ok(new ApiRespones<>(true,"All tickets retrieved successfully.",HttpStatus.OK,tickets.stream().skip(currentIndex).limit(pageSize).collect(Collectors.toList()),LocalDate.now()));
         }
-        return ResponseEntity.ok(listApiRespones);
+        return ResponseEntity.ok(new ApiRespones<>(false,"There are no Ticket",HttpStatus.NOT_FOUND,LocalDate.now()));
     }
 
     // create ticket
@@ -61,12 +59,9 @@ public class Controller {
     public ResponseEntity<ApiRespones<Ticket>> addTicket(@RequestBody Ticket newTicket){
         if(newTicket.getPrice()>0){
             tickets.add(newTicket);
-            respones = new ApiRespones<>(true, "Create ticket successfully", HttpStatus.OK,newTicket,LocalDate.now());
-        }else{
-            respones = new ApiRespones<>(false, "False to Create ticket", HttpStatus.BAD_REQUEST,newTicket,LocalDate.now());
-
+            return ResponseEntity.ok( new ApiRespones<>(true, "Create ticket successfully", HttpStatus.OK,newTicket,LocalDate.now()));
         }
-        return ResponseEntity.ok(respones);
+        return ResponseEntity.ok(new ApiRespones<>(false, "False to Create ticket", HttpStatus.BAD_REQUEST,newTicket,LocalDate.now()));
 
     }
 
@@ -76,13 +71,10 @@ public class Controller {
     public ResponseEntity<ApiRespones<Ticket>> getTicketById(@PathVariable("ticket-id")  int ticketId ){
         for(Ticket ticket : tickets){
             if (ticket.getTicketId() == ticketId){
-                respones = new ApiRespones<>(true, "Create ticket successfully", HttpStatus.OK,ticket,LocalDate.now());
-            }else{
-                respones = new ApiRespones<>(false, "No ticket found with ID: " + ticketId ,HttpStatus.NOT_FOUND,LocalDate.now());
-
+                return ResponseEntity.ok(new ApiRespones<>(true, "Success get ticket by id ", HttpStatus.OK,ticket,LocalDate.now()));
             }
         }
-        return ResponseEntity.ok(respones);
+        return ResponseEntity.ok(new ApiRespones<>(false, "No ticket found with ID: " + ticketId ,HttpStatus.NOT_FOUND,LocalDate.now()));
     }
 
     // update an existing ticket by id
@@ -99,12 +91,10 @@ public class Controller {
                 ticket.setPaymentStatus(requestTicket.isPaymentStatus());
                 ticket.setTicketStatus(requestTicket.getTicketStatus());
                 ticket.setSeatNumber(requestTicket.getSeatNumber());
-                respones = new ApiRespones<>(true,"update success",HttpStatus.OK,ticket,LocalDate.now());
-            }else {
-                respones = new ApiRespones<>(false,"update false",HttpStatus.BAD_REQUEST,LocalDate.now());
+                return ResponseEntity.ok(new ApiRespones<>(true,"update success",HttpStatus.OK,ticket,LocalDate.now()));
             }
         }
-        return ResponseEntity.ok(respones);
+        return ResponseEntity.ok(new ApiRespones<>(false,"update false",HttpStatus.BAD_REQUEST,LocalDate.now()));
     }
 
     //delete ticket
@@ -114,13 +104,10 @@ public class Controller {
         for(Ticket ticket : tickets){
             if(ticket.getTicketId() == deleteId){
                 tickets.remove(ticket);
-                respones = new ApiRespones<>(true, "Ticket deleted successfully",HttpStatus.OK,ticket,LocalDate.now());
-                break;
-            }else{
-                respones = new ApiRespones<>(false, "No ticket found with ID: " + deleteId ,HttpStatus.NOT_FOUND,LocalDate.now());
+                return ResponseEntity.ok(new ApiRespones<>(true, "Ticket deleted successfully",HttpStatus.OK,ticket,LocalDate.now()));
             }
         }
-        return ResponseEntity.ok(respones);
+        return ResponseEntity.ok(new ApiRespones<>(false, "No ticket found with ID: " + deleteId ,HttpStatus.NOT_FOUND,LocalDate.now()));
     }
 
 
@@ -130,12 +117,21 @@ public class Controller {
     public ResponseEntity<ApiRespones<Ticket>> searchByName(@RequestParam String name){
         for(Ticket ticket : tickets){
             if(ticket.getPassengerName().toLowerCase().contains(name.toLowerCase())){
-                respones = new ApiRespones<>(true,"Found Ticket",HttpStatus.OK,ticket,LocalDate.now());
-            }else {
-                respones = new ApiRespones<>(false,"Ticket not found with this name !",HttpStatus.NOT_FOUND,LocalDate.now());
+                return ResponseEntity.ok(new ApiRespones<>(
+                        true,
+                        "Found Ticket",
+                        HttpStatus.OK,
+                        ticket,
+                        LocalDate.now()
+                ));
             }
         }
-        return ResponseEntity.ok(respones);
+        return ResponseEntity.ok(new ApiRespones<>(
+                false,
+                "Ticket not found with this name!",
+                HttpStatus.NOT_FOUND,
+                LocalDate.now()
+        ));
     }
 
 
@@ -145,12 +141,10 @@ public class Controller {
     public ResponseEntity<ApiRespones<Ticket>> filter(@RequestParam("ticketStatus") TicketStatus ticketStatus, @RequestParam("travelDate") LocalDate travelDate){
         for (Ticket ticket : tickets){
             if (ticket.getTicketStatus().equals(ticketStatus) && ticket.getTravelDate().equals(travelDate)){
-                respones = new ApiRespones<>(true,"Ticket found", HttpStatus.OK,ticket,LocalDate.now());
-            }else {
-                respones = new ApiRespones<>(false,"Ticket not found with this name and travel date !",HttpStatus.NOT_FOUND,LocalDate.now());
+                return ResponseEntity.ok(new ApiRespones<>(true,"Ticket found", HttpStatus.OK,ticket,LocalDate.now()));
             }
         }
-        return ResponseEntity.ok(respones);
+        return ResponseEntity.ok(new ApiRespones<>(false,"Ticket not found with this name and travel date !",HttpStatus.NOT_FOUND,LocalDate.now()));
     }
 
     // post bulk
@@ -159,11 +153,9 @@ public class Controller {
     public ResponseEntity<ApiRespones<List<Ticket>>> bulkCreateTicket(@RequestBody List<Ticket> bulkTicket){
         if(bulkTicket.size() > 0){
             tickets.addAll(bulkTicket);
-            listApiRespones = new ApiRespones<>(true,"created",HttpStatus.CREATED,bulkTicket,LocalDate.now());
-        }else{
-            listApiRespones = new ApiRespones<>(false,"failed to create",HttpStatus.BAD_REQUEST,LocalDate.now());
+            ResponseEntity.ok(new ApiRespones<>(true,"created",HttpStatus.CREATED,bulkTicket,LocalDate.now()));
         }
-        return  ResponseEntity.ok(listApiRespones);
+        return  ResponseEntity.ok(new ApiRespones<>(false,"failed to create",HttpStatus.BAD_REQUEST,LocalDate.now()));
     }
 
     // update payment status bulk
@@ -174,13 +166,11 @@ public class Controller {
             for (RequestPaymentUpdate reqUp : requestPaymentUpdateList){
                 if (ticket.getTicketId() == reqUp.getTicketId()){
                     ticket.setPaymentStatus(reqUp.isPaymentStatus());
-                    listApiRespones = new ApiRespones<>(true,"Payment status updated successfully",HttpStatus.OK,LocalDate.now());
-                }else {
-                    listApiRespones = new ApiRespones<>(false,"Payment status updated failed",HttpStatus.BAD_REQUEST,LocalDate.now());
+                    return ResponseEntity.ok(new ApiRespones<>(true,"Payment status updated successfully",HttpStatus.OK,LocalDate.now()));
                 }
             }
         }
-        return ResponseEntity.ok(listApiRespones);
+        return ResponseEntity.ok(new ApiRespones<>(false,"Payment status updated failed",HttpStatus.BAD_REQUEST,LocalDate.now()));
     }
 
 }
