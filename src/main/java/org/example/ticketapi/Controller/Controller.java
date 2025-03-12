@@ -15,6 +15,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/tickets")
@@ -27,15 +29,32 @@ public class Controller {
         tickets.add(new Ticket(1,"Mengsea",LocalDate.now(),"PP","PPT",22.5,false, TicketStatus.BOOKED,"002A"));
         tickets.add(new Ticket(2,"Shoko",LocalDate.now(),"KK","KPC",12.3,true, TicketStatus.CANCELLED,"21A4"));
         tickets.add(new Ticket(3,"Shoshi",LocalDate.now(),"SR","BMC",10.5,false, TicketStatus.COMPLETED,"C3F2"));
+        tickets.add(new Ticket(4,"shikigami",LocalDate.now(),"PP","PPT",22.5,false, TicketStatus.BOOKED,"002A"));
+        tickets.add(new Ticket(5,"geto",LocalDate.now(),"KK","KPC",12.3,true, TicketStatus.CANCELLED,"21A4"));
+        tickets.add(new Ticket(6,"gojo",LocalDate.now(),"SR","BMC",10.5,false, TicketStatus.COMPLETED,"C3F2"));tickets.add(new Ticket(1,"Mengsea",LocalDate.now(),"PP","PPT",22.5,false, TicketStatus.BOOKED,"002A"));
+        tickets.add(new Ticket(7,"sukuna",LocalDate.now(),"KK","KPC",12.3,true, TicketStatus.CANCELLED,"21A4"));
+        tickets.add(new Ticket(8,"kakashi",LocalDate.now(),"SR","BMC",10.5,false, TicketStatus.COMPLETED,"C3F2"));tickets.add(new Ticket(1,"Mengsea",LocalDate.now(),"PP","PPT",22.5,false, TicketStatus.BOOKED,"002A"));
+        tickets.add(new Ticket(9,"naruto",LocalDate.now(),"KK","KPC",12.3,true, TicketStatus.CANCELLED,"21A4"));
+        tickets.add(new Ticket(10,"kyo",LocalDate.now(),"SR","BMC",10.5,false, TicketStatus.COMPLETED,"C3F2"));
 
     }
 
     // get All ticket {pagination not yet implement}
     @GetMapping
     @Operation(summary = "Get all tickets")
-    public ResponseEntity<ApiRespones<List<Ticket>>> tickets(){
+    public ResponseEntity<ApiRespones<List<Ticket>>> tickets(@RequestParam int page , int size){
+        int defualtPage = 1 ;
+        int pageSize = 10 ;
+        if(defualtPage != page){
+            defualtPage = page + size;
+
+        }
+        if(pageSize != page){
+            pageSize = size;
+        }
+
         if(tickets.size() > 0){
-            listApiRespones = new ApiRespones<>(true,"All tickets retrieved successfully.",HttpStatus.OK,tickets,LocalDate.now());
+            listApiRespones = new ApiRespones<>(true,"All tickets retrieved successfully.",HttpStatus.OK,tickets.stream().skip((defualtPage-1)).limit(pageSize).collect(Collectors.toList()),LocalDate.now());
         }else{
             listApiRespones = new ApiRespones<>(false,"There are no Ticket",HttpStatus.NOT_FOUND,LocalDate.now());
         }
